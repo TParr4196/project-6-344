@@ -25,7 +25,7 @@ int myalloc(int n){
   }
   struct block *traversal=head;
   int traversed = 0;
-  while (traversal->in_use==1){
+  while (traversal->in_use==1&&PADDED_SIZE(n)<traversal->size){
     traversed = traversed+traversal->size;
     traversal=traversal->next; //traverse until an unused block is found
     if(traversal->next==NULL){
