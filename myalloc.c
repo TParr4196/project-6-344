@@ -13,29 +13,35 @@ struct block {
     int in_use;   // Boolean
 };
 
-int* myalloc(int n){
-  struct block *head = NULL;  // Head of the list, empty
+struct block *head = NULL;  // Head of the list, empty
+
+int myalloc(int n){
   if (head == NULL) {
+    void *heap = sbrk(1024);
     head = sbrk(1024);
     head->next = NULL;
     head->size = 1024 - PADDED_SIZE(sizeof(struct block));
     head->in_use = 0;
   }
   struct block *traversal=head;
-  while (traversal->in_use==1){ 
+  int traversed = 0;
+  while (traversal->in_use==1){
+    traversed = traversed+traversal->size;
     traversal=traversal->next; //traverse until an unused block is found
     if(traversal->next==NULL){
       break;
     }//break if next is NULL
   }
   if(traversal->next==NULL){
-    struct block *next_block = NULL;
-    next_block = sbrk(1024);
-    traversal->next=next_block;
-    next_block->next=NULL;
-    next_block->size=PADDED_SIZE(n);
-    next_block->in_use=1; //instantiate new block
-    traversal=next_block;
+    if(traversed+PADDED_SIZE(n)<=1024){
+      struct block *next_block = NULL;
+      next_block = head+traversed;
+      traversal->next=next_block;
+      next_block->next=NULL;
+      next_block->size=PADDED_SIZE(n);
+      next_block->in_use=1; //instantiate new block
+      traversal=next_block;
+    }
   }
   else{
     traversal->size=PADDED_SIZE(n);
@@ -45,8 +51,33 @@ int* myalloc(int n){
   return PTR_OFFSET(traversal, padded_block_size);
 }
 
+void print_data(void)
+{
+    struct block *b = head;
+
+    if (b == NULL) {
+        printf("[empty]\n");
+        return;
+    }
+
+    while (b != NULL) {
+        // Uncomment the following line if you want to see the pointer values
+        //printf("[%p:%d,%s]", b, b->size, b->in_use? "used": "free");
+        printf("[%d,%s]", b->size, b->in_use? "used": "free");
+        if (b->next != NULL) {
+            printf(" -> ");
+        }
+
+        b = b->next;
+    }
+
+    printf("\n");
+}
+
 int main(void){
-  void *heap = sbrk(1024);
-  int *n =myalloc(15);
-  printf("%d", *n);
+  void *p;
+
+  print_data();
+  p = myalloc(64);
+  print_data();
 }
