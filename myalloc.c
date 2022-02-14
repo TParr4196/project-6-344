@@ -35,7 +35,7 @@ int myalloc(int n){
   if(traversal->next==NULL){
     if(traversed+PADDED_SIZE(n)<=1024){
       struct block *next_block = NULL;
-      next_block = head+traversed;
+      next_block = head+PADDED_SIZE(traversed);
       traversal->next=next_block;
       next_block->next=NULL;
       next_block->size=PADDED_SIZE(n);
