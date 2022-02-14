@@ -41,6 +41,8 @@ int myalloc(int n){
       next_block->size=PADDED_SIZE(n);
       next_block->in_use=1; //instantiate new block
       traversal=next_block;
+    }else{
+      traversal=NULL;
     }
   }
   else{
