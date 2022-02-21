@@ -6,6 +6,7 @@
 #define GET_PAD(x) ((ALIGNMENT - 1) - (((x) - 1) & (ALIGNMENT - 1)))
 
 #define PADDED_SIZE(x) ((x) + GET_PAD(x))
+#define PTR_OFFSET(p, offset) ((void*)((char *)(p) + (offset)))
 
 struct block {
     struct block *next;
@@ -15,10 +16,10 @@ struct block {
 
 struct block *head = NULL;  // Head of the list, empty
 
-int myalloc(int n){
+void * myalloc(int n){
   if (head == NULL) {
     void *heap = sbrk(1024);
-    head = sbrk(1024);
+    head = heap;
     head->next = NULL;
     head->size = 1024 - PADDED_SIZE(sizeof(struct block));
     head->in_use = 0;
@@ -42,7 +43,7 @@ int myalloc(int n){
       next_block->in_use=1; //instantiate new block
       traversal=next_block;
     }else{
-      traversal=NULL;
+      return NULL;
     }
   }
   else{
